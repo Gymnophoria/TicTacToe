@@ -11,12 +11,12 @@ TicTacToe::TicTacToe() {
 }
 
 void TicTacToe::turn(int player) {
-	console("It's your turn, Player " + std::to_string(player) + ". Choose which slot number you would like to use. (You are x)");
+	console("It's your turn, Player " + std::to_string(player) + ". Choose which slot number you would like to use. (You are " + playerChar(player) + ")");
 	
 	int slot;
 	std::cin >> slot;
 	
-	if (slot < 1 || slot > 10) {
+	if (slot < 1 || slot > 9) {
 		console("That's not a valid slot number.");
 		return turn(player);
 	}
@@ -30,6 +30,9 @@ void TicTacToe::turn(int player) {
 	
 	++turnNum;
 	
+	console("The current board is:");
+	generateBoard();
+	
 	if (checkWin()) {
 		console("Player " + std::to_string(player) + " has won! Would you like a rematch? <true/false>");
 		
@@ -42,18 +45,43 @@ void TicTacToe::turn(int player) {
 		return askReplay();
 	}
 	
-	console("The current board is:");
-	generateBoard();
-	
 	turn(oppositePlayer(player));
 }
 
 bool TicTacToe::checkSlot(int slot) {
-	return board[slot] != 0;
+	return board[slot - 1] != 0;
 }
 
 bool TicTacToe::checkWin() {
-	return false;
+	std::array<std::array<int, 3>, 3> rows;
+	std::array<std::array<int, 3>, 3> columns;
+	std::array<std::array<int, 3>, 2> diagonals;
+	
+	diagonals[0] = {board[2], board[4], board[6]};
+	diagonals[1] = {board[0], board[4], board[8]};
+	
+	for (int i = 0; i < 3; ++i) {
+		rows[0][i] = board[i];
+		rows[1][i] = board[i + 3];
+		rows[2][i] = board[i + 6];
+		columns[i] = {board[i], board[i + 3], board[i + 6]};
+	}
+	
+	bool won = false;
+	
+	for (int i = 0; i < 3; ++i) { // rows
+		if (rows[i][0] == rows[i][1] && rows[i][1] == rows[i][2] && rows[i][2] == rows[i][0]) won = true;
+	}
+	
+	for (int i = 0; i < 3; ++i) { // columns
+		if (columns[i][0] == columns[i][1] && columns[i][1] == columns[i][2] && columns[i][2] == columns[i][0]) won = true;
+	}
+	
+	for (int i = 0; i < 2; ++i) { // diagonals
+		if (diagonals[i][0] == diagonals[i][1] && diagonals[i][1] == diagonals[i][2] && diagonals[i][2] == diagonals[i][0]) won = true;
+	}
+	
+	return won;
 }
 
 void TicTacToe::start() {
